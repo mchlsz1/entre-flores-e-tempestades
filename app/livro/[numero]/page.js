@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 
@@ -15,8 +15,35 @@ export default function Capitulo() {
   const [progresso, setProgresso] = useState(0);
   const [carregado, setCarregado] = useState(false);
 
+  const saindoRef = useRef(false);
+
   const anterior = n > 1 ? String(n - 1).padStart(2, "0") : null;
   const proximo = n < 36 ? String(n + 1).padStart(2, "0") : null;
+
+  // Salva a posição antes de navegar para outra página.
+  function salvarAntesDeSair() {
+    const altura =
+      document.documentElement.scrollHeight - window.innerHeight;
+
+    const posicao = window.scrollY;
+
+    const valor =
+      altura > 0
+        ? Math.min(100, Math.max(0, Math.round((posicao / altura) * 100)))
+        : 0;
+
+    localStorage.setItem(
+      `ef_temp_progresso_${codigo}`,
+      String(valor)
+    );
+
+    localStorage.setItem(
+      `ef_temp_posicao_${codigo}`,
+      String(posicao)
+    );
+
+    saindoRef.current = true;
+  }
 
   const botao = {
     background: "transparent",
@@ -35,15 +62,18 @@ export default function Capitulo() {
     padding: "7px 4px"
   };
 
-  // Recupera as preferências e a posição salva.
+  // Recupera preferências e posição salva.
   useEffect(() => {
     window.history.scrollRestoration = "manual";
+    saindoRef.current = false;
 
     const fonteSalva = localStorage.getItem("ef_temp_fonte");
     const modoSalvo = localStorage.getItem("ef_temp_noturno");
+
     const progressoSalvo = localStorage.getItem(
       `ef_temp_progresso_${codigo}`
     );
+
     const posicaoSalva = localStorage.getItem(
       `ef_temp_posicao_${codigo}`
     );
@@ -52,11 +82,11 @@ export default function Capitulo() {
       setFonte(Number(fonteSalva));
     }
 
-    if (modoSalvo) {
+    if (modoSalvo !== null) {
       setNoturno(modoSalvo === "true");
     }
 
-    if (progressoSalvo) {
+    if (progressoSalvo !== null) {
       setProgresso(Number(progressoSalvo));
     }
 
@@ -71,7 +101,6 @@ export default function Capitulo() {
         });
       });
 
-      // Segunda tentativa para o Safari no iPhone.
       const temporizador = setTimeout(() => {
         window.scrollTo(0, posicao);
       }, 600);
@@ -88,11 +117,13 @@ export default function Capitulo() {
     localStorage.setItem("ef_temp_noturno", String(noturno));
   }, [fonte, noturno, carregado]);
 
-  // Salva e atualiza o progresso da leitura.
+  // Salva e atualiza o progresso.
   useEffect(() => {
     if (!carregado) return;
 
     function atualizarProgresso() {
+      if (saindoRef.current) return;
+
       const altura =
         document.documentElement.scrollHeight - window.innerHeight;
 
@@ -121,11 +152,16 @@ export default function Capitulo() {
     });
 
     window.addEventListener("pagehide", atualizarProgresso);
-    document.addEventListener("visibilitychange", atualizarProgresso);
+
+    document.addEventListener(
+      "visibilitychange",
+      atualizarProgresso
+    );
 
     return () => {
       window.removeEventListener("scroll", atualizarProgresso);
       window.removeEventListener("pagehide", atualizarProgresso);
+
       document.removeEventListener(
         "visibilitychange",
         atualizarProgresso
@@ -169,11 +205,19 @@ export default function Capitulo() {
         justifyContent: "space-between",
         gap: 15
       }}>
-        <Link href="/" style={{ color: verde }}>
+        <Link
+          href="/"
+          onClick={salvarAntesDeSair}
+          style={{ color: verde }}
+        >
           ← Início
         </Link>
 
-        <Link href="/livro" style={{ color: verde }}>
+        <Link
+          href="/livro"
+          onClick={salvarAntesDeSair}
+          style={{ color: verde }}
+        >
           Sumário
         </Link>
       </header>
@@ -346,17 +390,29 @@ export default function Capitulo() {
         gap: 10
       }}>
         {anterior ? (
-          <Link href={`/livro/${anterior}`} style={linkRodape}>
+          <Link
+            href={`/livro/${anterior}`}
+            onClick={salvarAntesDeSair}
+            style={linkRodape}
+          >
             ← Anterior
           </Link>
         ) : <span />}
 
-        <Link href="/livro" style={linkRodape}>
+        <Link
+          href="/livro"
+          onClick={salvarAntesDeSair}
+          style={linkRodape}
+        >
           ☷ Sumário
         </Link>
 
         {proximo ? (
-          <Link href={`/livro/${proximo}`} style={linkRodape}>
+          <Link
+            href={`/livro/${proximo}`}
+            onClick={salvarAntesDeSair}
+            style={linkRodape}
+          >
             Próximo →
           </Link>
         ) : <span />}
