@@ -1,93 +1,125 @@
 
 import Link from "next/link";
 
-export default function Home() {
+const partes = [
+  { numero: "I", nome: "O despertar", inicio: 1 },
+  { numero: "II", nome: "Entre raízes e lembranças", inicio: 7 },
+  { numero: "III", nome: "A estação das tempestades", inicio: 13 },
+  { numero: "IV", nome: "O florescer das descobertas", inicio: 19 },
+  { numero: "V", nome: "Aquilo que permanece", inicio: 25 },
+  { numero: "VI", nome: "Depois da última folha", inicio: 31 }
+];
+
+export default function Livro() {
   return (
-    <main>
+    <main style={{
+      minHeight: "100vh",
+      background: "#f4eedf",
+      color: "#302d25",
+      padding: "35px 7%"
+    }}>
+      <Link href="/" style={{ color: "#173d2b" }}>
+        ← Voltar ao jardim
+      </Link>
+
       <header style={{
-        background: "#102b20",
-        color: "#f4eedf",
-        padding: "25px 8%",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexWrap: "wrap",
-        gap: "15px"
-      }}>
-        <h2>Entre Flores e Tempestades</h2>
-
-        <nav style={{
-          display: "flex",
-          gap: "20px"
-        }}>
-          <Link href="/login">Entrar</Link>
-          <Link href="/cadastro" style={{
-            color: "#c5a15b"
-          }}>
-            Criar conta
-          </Link>
-        </nav>
-      </header>
-
-      <section style={{
-        minHeight: "85vh",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
         textAlign: "center",
-        padding: "40px 20px",
-        background: "#f4eedf"
+        maxWidth: "700px",
+        margin: "75px auto 60px"
       }}>
-
         <p style={{
           color: "#a18348",
           letterSpacing: "4px",
-          marginBottom: "25px"
+          fontSize: "12px"
         }}>
-          UMA JORNADA ENTRE SENTIMENTOS
+          SUMÁRIO
         </p>
 
         <h1 style={{
-          fontSize: "clamp(38px, 7vw, 76px)",
           color: "#173d2b",
-          maxWidth: "850px",
+          fontSize: "clamp(36px, 7vw, 58px)",
           fontWeight: "normal",
-          marginBottom: "25px"
+          margin: "25px 0"
         }}>
           Entre Flores e Tempestades
         </h1>
 
         <p style={{
-          fontSize: "19px",
-          lineHeight: "1.8",
-          maxWidth: "600px",
-          color: "#625c4e"
+          lineHeight: "1.9",
+          fontStyle: "italic",
+          color: "#756c5c"
         }}>
-          Algumas coisas não encontram palavras.
-          Por isso, florescem em metáforas.
+          Toda jornada possui suas estações.
+          Algumas florescem, outras ensinam.
         </p>
 
-        <Link href="/livro" style={{
-          marginTop: "40px",
-          padding: "16px 35px",
-          background: "#173d2b",
-          color: "#f4eedf",
-          border: "1px solid #c5a15b"
-        }}>
-          Entrar no jardim
-        </Link>
+        <div style={{
+          width: "65px",
+          height: "1px",
+          background: "#c5a15b",
+          margin: "35px auto"
+        }} />
+      </header>
 
-        <p style={{
-          marginTop: "70px",
-          color: "#a18348",
-          fontSize: "14px",
-          fontStyle: "italic"
-        }}>
-          Que aos bons olhos o cair das folhas seja um começo e não o fim.
-        </p>
+      <section style={{
+        maxWidth: "720px",
+        margin: "0 auto"
+      }}>
+        {partes.map((parte) => (
+          <details key={parte.numero} style={{
+            borderBottom: "1px solid #d8cdb8",
+            padding: "22px 5px"
+          }}>
+            <summary style={{
+              cursor: "pointer",
+              listStyle: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "20px"
+            }}>
+              <span style={{
+                color: "#c5a15b",
+                fontSize: "25px"
+              }}>
+                {parte.numero}
+              </span>
 
+              <span style={{
+                color: "#173d2b",
+                fontSize: "20px"
+              }}>
+                {parte.nome}
+              </span>
+            </summary>
+
+            <div style={{
+              padding: "20px 0 0 48px",
+              color: "#756c5c",
+              lineHeight: "2.5"
+            }}>
+              {Array.from({ length: 6 }, (_, i) => (
+                <p key={i}>
+                  Capítulo {String(parte.inicio + i).padStart(2, "0")}
+                </p>
+              ))}
+            </div>
+          </details>
+        ))}
       </section>
+
+      <footer style={{
+        textAlign: "center",
+        margin: "75px auto 30px",
+        color: "#a18348",
+        fontStyle: "italic",
+        lineHeight: "1.8"
+      }}>
+        Que aos bons olhos o cair das folhas seja
+        um começo e não o fim.
+        <p style={{ marginTop: "20px" }}>
+          Michel Rocha e ChatGPT
+        </p>
+      </footer>
     </main>
   );
 }
