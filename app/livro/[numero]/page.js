@@ -18,32 +18,69 @@ export default function Capitulo() {
   const anterior = n > 1 ? String(n - 1).padStart(2, "0") : null;
   const proximo = n < 36 ? String(n + 1).padStart(2, "0") : null;
 
+  const botao = {
+    background: "transparent",
+    border: "1px solid #c5a15b",
+    color: "#a18348",
+    padding: "10px 14px",
+    marginRight: 7,
+    fontSize: 14,
+    cursor: "pointer"
+  };
+
+  const linkRodape = {
+    color: "#a18348",
+    textDecoration: "none",
+    fontSize: 13,
+    padding: "7px 4px"
+  };
+
+  // Recupera as preferências e a posição salva.
   useEffect(() => {
+    window.history.scrollRestoration = "manual";
+
     const fonteSalva = localStorage.getItem("ef_temp_fonte");
     const modoSalvo = localStorage.getItem("ef_temp_noturno");
-    const progressoSalvo = localStorage.getItem(`ef_temp_progresso_${codigo}`);
-    const posicaoSalva = localStorage.getItem(`ef_temp_posicao_${codigo}`);
+    const progressoSalvo = localStorage.getItem(
+      `ef_temp_progresso_${codigo}`
+    );
+    const posicaoSalva = localStorage.getItem(
+      `ef_temp_posicao_${codigo}`
+    );
 
-    if (fonteSalva) setFonte(Number(fonteSalva));
-    if (modoSalvo) setNoturno(modoSalvo === "true");
+    if (fonteSalva) {
+      setFonte(Number(fonteSalva));
+    }
 
-    if (progressoSalvo) setProgresso(Number(progressoSalvo));
+    if (modoSalvo) {
+      setNoturno(modoSalvo === "true");
+    }
+
+    if (progressoSalvo) {
+      setProgresso(Number(progressoSalvo));
+    }
+
+    const posicao = posicaoSalva ? Number(posicaoSalva) : 0;
 
     setCarregado(true);
 
-    if (posicaoSalva) {
-  const posicao = Number(posicaoSalva);
+    if (posicao > 0) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, posicao);
+        });
+      });
 
-  window.history.scrollRestoration = "manual";
+      // Segunda tentativa para o Safari no iPhone.
+      const temporizador = setTimeout(() => {
+        window.scrollTo(0, posicao);
+      }, 600);
 
-  setTimeout(() => {
-    window.scrollTo({
-      top: posicao,
-      behavior: "instant"
-    });
-  }, 500);
-}
+      return () => clearTimeout(temporizador);
+    }
+  }, [codigo]);
 
+  // Salva tamanho da fonte e modo de leitura.
   useEffect(() => {
     if (!carregado) return;
 
@@ -51,6 +88,7 @@ export default function Capitulo() {
     localStorage.setItem("ef_temp_noturno", String(noturno));
   }, [fonte, noturno, carregado]);
 
+  // Salva e atualiza o progresso da leitura.
   useEffect(() => {
     if (!carregado) return;
 
@@ -58,9 +96,12 @@ export default function Capitulo() {
       const altura =
         document.documentElement.scrollHeight - window.innerHeight;
 
-      const valor = altura > 0
-        ? Math.min(100, Math.round((window.scrollY / altura) * 100))
-        : 0;
+      const posicao = window.scrollY;
+
+      const valor =
+        altura > 0
+          ? Math.min(100, Math.max(0, Math.round((posicao / altura) * 100)))
+          : 0;
 
       setProgresso(valor);
 
@@ -71,24 +112,36 @@ export default function Capitulo() {
 
       localStorage.setItem(
         `ef_temp_posicao_${codigo}`,
-        String(window.scrollY)
+        String(posicao)
       );
     }
 
-    window.addEventListener("scroll", atualizarProgresso, { passive: true });
+    window.addEventListener("scroll", atualizarProgresso, {
+      passive: true
+    });
 
     window.addEventListener("pagehide", atualizarProgresso);
+    document.addEventListener("visibilitychange", atualizarProgresso);
 
     return () => {
       atualizarProgresso();
+
       window.removeEventListener("scroll", atualizarProgresso);
       window.removeEventListener("pagehide", atualizarProgresso);
+      document.removeEventListener(
+        "visibilitychange",
+        atualizarProgresso
+      );
     };
   }, [codigo, carregado]);
 
   if (!Number.isInteger(n) || n < 1 || n > 36) {
     return (
-      <main style={{ padding: 40 }}>
+      <main style={{
+        padding: 40,
+        background: "#f4eedf",
+        minHeight: "100vh"
+      }}>
         <h1>Capítulo não encontrado</h1>
         <Link href="/livro">Voltar ao sumário</Link>
       </main>
@@ -100,41 +153,34 @@ export default function Capitulo() {
   const texto = noturno ? "#e8dfca" : "#302d25";
   const verde = noturno ? "#d4c49c" : "#173d2b";
   const dourado = "#c5a15b";
-const botao = {
-  background: "transparent",
-  border: "1px solid #c5a15b",
-  color: "#a18348",
-  padding: "10px 14px",
-  marginRight: 7,
-  fontSize: 14,
-  cursor: "pointer"
-};
 
-const linkRodape = {
-  color: "#a18348",
-  textDecoration: "none",
-  fontSize: 13,
-  padding: "7px 4px"
-};
   return (
     <main style={{
       minHeight: "100vh",
       background: fundo,
       color: texto,
-      padding: "25px 15px 110px",
-      transition: "background 0.3s"
+      padding: "55px 15px 100px",
+      transition: "background 0.3s, color 0.3s"
     }}>
 
+      {/* Cabeçalho */}
       <header style={{
         maxWidth: 850,
         margin: "0 auto 20px",
         display: "flex",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        gap: 15
       }}>
-        <Link href="/" style={{ color: verde }}>← Início</Link>
-        <Link href="/livro" style={{ color: verde }}>Sumário</Link>
+        <Link href="/" style={{ color: verde }}>
+          ← Início
+        </Link>
+
+        <Link href="/livro" style={{ color: verde }}>
+          Sumário
+        </Link>
       </header>
 
+      {/* Ajustes de leitura */}
       <section style={{
         maxWidth: 760,
         margin: "0 auto 20px",
@@ -148,24 +194,38 @@ const linkRodape = {
         gap: 15
       }}>
         <div>
-          <p style={{ color: verde, fontSize: 13, marginBottom: 8 }}>
+          <p style={{
+            color: verde,
+            fontSize: 13,
+            marginBottom: 8
+          }}>
             AJUSTES DE LEITURA
           </p>
 
-          <button onClick={() => setFonte(v => Math.max(16, v - 2))} style={botao}>
+          <button
+            onClick={() => setFonte(v => Math.max(16, v - 2))}
+            style={botao}
+          >
             A−
           </button>
 
-          <button onClick={() => setFonte(v => Math.min(30, v + 2))} style={botao}>
+          <button
+            onClick={() => setFonte(v => Math.min(30, v + 2))}
+            style={botao}
+          >
             A+
           </button>
         </div>
 
-        <button onClick={() => setNoturno(v => !v)} style={botao}>
+        <button
+          onClick={() => setNoturno(v => !v)}
+          style={botao}
+        >
           {noturno ? "☀ Modo claro" : "☾ Modo noturno"}
         </button>
       </section>
 
+      {/* Página do livro */}
       <article style={{
         maxWidth: 760,
         minHeight: 1100,
@@ -175,8 +235,10 @@ const linkRodape = {
         color: texto,
         border: `1px solid ${noturno ? "#6b634c" : "#d7c9a9"}`,
         boxShadow: "0 12px 35px rgba(50, 39, 20, 0.12)",
-        position: "relative"
+        position: "relative",
+        transition: "background 0.3s"
       }}>
+
         <div style={{
           position: "absolute",
           inset: 12,
@@ -184,7 +246,10 @@ const linkRodape = {
           pointerEvents: "none"
         }} />
 
-        <div style={{ position: "relative", textAlign: "center" }}>
+        <div style={{
+          position: "relative",
+          textAlign: "center"
+        }}>
           <p style={{
             color: dourado,
             letterSpacing: 4,
@@ -194,7 +259,11 @@ const linkRodape = {
             Entre Flores e Tempestades
           </p>
 
-          <div style={{ margin: "38px auto", color: dourado, fontSize: 25 }}>
+          <div style={{
+            margin: "38px auto",
+            color: dourado,
+            fontSize: 25
+          }}>
             ❧
           </div>
 
@@ -234,11 +303,19 @@ const linkRodape = {
             Algumas páginas precisam esperar o momento certo para florescer.
           </p>
 
-          <div style={{ margin: "45px auto", color: dourado, fontSize: 22 }}>
+          <div style={{
+            margin: "45px auto",
+            color: dourado,
+            fontSize: 22
+          }}>
             ❦
           </div>
 
-          <p style={{ color: dourado, fontSize: 14, lineHeight: 1.8 }}>
+          <p style={{
+            color: dourado,
+            fontSize: 14,
+            lineHeight: 1.8
+          }}>
             Este capítulo está sendo preparado.
           </p>
         </div>
@@ -255,6 +332,7 @@ const linkRodape = {
         </footer>
       </article>
 
+      {/* Navegação fixa inferior */}
       <nav style={{
         position: "fixed",
         bottom: 0,
@@ -286,6 +364,7 @@ const linkRodape = {
         ) : <span />}
       </nav>
 
+      {/* Barra fixa de progresso */}
       <div style={{
         position: "fixed",
         top: 0,
@@ -321,7 +400,7 @@ const linkRodape = {
           }} />
         </div>
       </div>
+
     </main>
   );
 }
-
