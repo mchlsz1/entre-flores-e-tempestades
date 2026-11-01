@@ -100,7 +100,22 @@ export default function Capitulo() {
   const texto = noturno ? "#e8dfca" : "#302d25";
   const verde = noturno ? "#d4c49c" : "#173d2b";
   const dourado = "#c5a15b";
+const botao = {
+  background: "transparent",
+  border: "1px solid #c5a15b",
+  color: "#a18348",
+  padding: "10px 14px",
+  marginRight: 7,
+  fontSize: 14,
+  cursor: "pointer"
+};
 
+const linkRodape = {
+  color: "#a18348",
+  textDecoration: "none",
+  fontSize: 13,
+  padding: "7px 4px"
+};
   return (
     <main style={{
       minHeight: "100vh",
@@ -310,19 +325,3 @@ export default function Capitulo() {
   );
 }
 
-const botao = {
-  background: "transparent",
-  border: "1px solid #c5a15b",
-  color: "#a18348",
-  padding: "10px 14px",
-  marginRight: 7,
-  fontSize: 14,
-  cursor: "pointer"
-};
-
-const linkRodape = {
-  color: "#a18348",
-  textDecoration: "none",
-  fontSize: 13,
-  padding: "7px 4px"
-};
