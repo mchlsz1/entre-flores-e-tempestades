@@ -8,13 +8,13 @@ import Link from "next/link";
 export default function Capitulo() {
   const params = useParams();
   const n = Number(params.numero);
+  const codigo = String(n).padStart(2, "0");
 
   const [fonte, setFonte] = useState(20);
   const [noturno, setNoturno] = useState(false);
   const [progresso, setProgresso] = useState(0);
   const [carregado, setCarregado] = useState(false);
 
-  const codigo = String(n).padStart(2, "0");
   const anterior = n > 1 ? String(n - 1).padStart(2, "0") : null;
   const proximo = n < 36 ? String(n + 1).padStart(2, "0") : null;
 
@@ -22,23 +22,24 @@ export default function Capitulo() {
     const fonteSalva = localStorage.getItem("ef_temp_fonte");
     const modoSalvo = localStorage.getItem("ef_temp_noturno");
     const progressoSalvo = localStorage.getItem(`ef_temp_progresso_${codigo}`);
+    const posicaoSalva = localStorage.getItem(`ef_temp_posicao_${codigo}`);
 
     if (fonteSalva) setFonte(Number(fonteSalva));
     if (modoSalvo) setNoturno(modoSalvo === "true");
 
-    if (progressoSalvo) {
-      const valor = Number(progressoSalvo);
-      setProgresso(valor);
-
-      requestAnimationFrame(() => {
-        const altura = document.documentElement.scrollHeight - window.innerHeight;
-        if (altura > 0) {
-          window.scrollTo(0, (valor / 100) * altura);
-        }
-      });
-    }
+    if (progressoSalvo) setProgresso(Number(progressoSalvo));
 
     setCarregado(true);
+
+    if (posicaoSalva) {
+      const posicao = Number(posicaoSalva);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, posicao);
+        });
+      });
+    }
   }, [codigo]);
 
   useEffect(() => {
@@ -55,24 +56,37 @@ export default function Capitulo() {
       const altura =
         document.documentElement.scrollHeight - window.innerHeight;
 
-      const valor =
-        altura > 0
-          ? Math.round((window.scrollY / altura) * 100)
-          : 0;
+      const valor = altura > 0
+        ? Math.min(100, Math.round((window.scrollY / altura) * 100))
+        : 0;
 
       setProgresso(valor);
-      localStorage.setItem(`ef_temp_progresso_${codigo}`, String(valor));
+
+      localStorage.setItem(
+        `ef_temp_progresso_${codigo}`,
+        String(valor)
+      );
+
+      localStorage.setItem(
+        `ef_temp_posicao_${codigo}`,
+        String(window.scrollY)
+      );
     }
 
-    window.addEventListener("scroll", atualizarProgresso);
-    atualizarProgresso();
+    window.addEventListener("scroll", atualizarProgresso, { passive: true });
 
-    return () => window.removeEventListener("scroll", atualizarProgresso);
+    window.addEventListener("pagehide", atualizarProgresso);
+
+    return () => {
+      atualizarProgresso();
+      window.removeEventListener("scroll", atualizarProgresso);
+      window.removeEventListener("pagehide", atualizarProgresso);
+    };
   }, [codigo, carregado]);
 
   if (!Number.isInteger(n) || n < 1 || n > 36) {
     return (
-      <main style={{ padding: 40, background: "#f4eedf", minHeight: "100vh" }}>
+      <main style={{ padding: 40 }}>
         <h1>Capítulo não encontrado</h1>
         <Link href="/livro">Voltar ao sumário</Link>
       </main>
@@ -90,16 +104,15 @@ export default function Capitulo() {
       minHeight: "100vh",
       background: fundo,
       color: texto,
-      padding: "25px 15px 40px",
-      transition: "background 0.3s, color 0.3s"
+      padding: "25px 15px 110px",
+      transition: "background 0.3s"
     }}>
 
       <header style={{
         maxWidth: 850,
         margin: "0 auto 20px",
         display: "flex",
-        justifyContent: "space-between",
-        gap: 15
+        justifyContent: "space-between"
       }}>
         <Link href="/" style={{ color: verde }}>← Início</Link>
         <Link href="/livro" style={{ color: verde }}>Sumário</Link>
@@ -113,8 +126,8 @@ export default function Capitulo() {
         border: `1px solid ${dourado}`,
         display: "flex",
         flexWrap: "wrap",
-        alignItems: "center",
         justifyContent: "space-between",
+        alignItems: "center",
         gap: 15
       }}>
         <div>
@@ -122,75 +135,31 @@ export default function Capitulo() {
             AJUSTES DE LEITURA
           </p>
 
-          <button
-            onClick={() => setFonte(v => Math.max(16, v - 2))}
-            style={botao}
-            aria-label="Diminuir tamanho da letra"
-          >
+          <button onClick={() => setFonte(v => Math.max(16, v - 2))} style={botao}>
             A−
           </button>
 
-          <button
-            onClick={() => setFonte(v => Math.min(30, v + 2))}
-            style={botao}
-            aria-label="Aumentar tamanho da letra"
-          >
+          <button onClick={() => setFonte(v => Math.min(30, v + 2))} style={botao}>
             A+
           </button>
         </div>
 
-        <button
-          onClick={() => setNoturno(v => !v)}
-          style={botao}
-        >
+        <button onClick={() => setNoturno(v => !v)} style={botao}>
           {noturno ? "☀ Modo claro" : "☾ Modo noturno"}
         </button>
       </section>
 
-      <section style={{
-        maxWidth: 760,
-        margin: "0 auto 20px",
-        padding: "0 5px",
-        color: noturno ? "#e8dfca" : "#756c5c"
-      }}>
-        <div style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: 12,
-          marginBottom: 7
-        }}>
-          <span>Seu progresso de leitura</span>
-          <span>{progresso}%</span>
-        </div>
-
-        <div style={{
-          height: 5,
-          background: noturno ? "#455044" : "#d7c9a9",
-          borderRadius: 10,
-          overflow: "hidden"
-        }}>
-          <div style={{
-            width: `${progresso}%`,
-            height: "100%",
-            background: dourado,
-            transition: "width 0.2s"
-          }} />
-        </div>
-      </section>
-
       <article style={{
         maxWidth: 760,
-        minHeight: "1100px",
+        minHeight: 1100,
         margin: "0 auto",
         padding: "65px clamp(25px, 8vw, 85px)",
         background: papel,
         color: texto,
         border: `1px solid ${noturno ? "#6b634c" : "#d7c9a9"}`,
         boxShadow: "0 12px 35px rgba(50, 39, 20, 0.12)",
-        position: "relative",
-        transition: "background 0.3s"
+        position: "relative"
       }}>
-
         <div style={{
           position: "absolute",
           inset: 12,
@@ -208,11 +177,7 @@ export default function Capitulo() {
             Entre Flores e Tempestades
           </p>
 
-          <div style={{
-            margin: "38px auto",
-            color: dourado,
-            fontSize: 25
-          }}>
+          <div style={{ margin: "38px auto", color: dourado, fontSize: 25 }}>
             ❧
           </div>
 
@@ -252,19 +217,11 @@ export default function Capitulo() {
             Algumas páginas precisam esperar o momento certo para florescer.
           </p>
 
-          <div style={{
-            margin: "45px auto",
-            color: dourado,
-            fontSize: 22
-          }}>
+          <div style={{ margin: "45px auto", color: dourado, fontSize: 22 }}>
             ❦
           </div>
 
-          <p style={{
-            color: dourado,
-            fontSize: 14,
-            lineHeight: 1.8
-          }}>
+          <p style={{ color: dourado, fontSize: 14, lineHeight: 1.8 }}>
             Este capítulo está sendo preparado.
           </p>
         </div>
@@ -275,32 +232,78 @@ export default function Capitulo() {
           left: 0,
           right: 0,
           textAlign: "center",
-          color: dourado,
-          fontSize: 12
+          color: dourado
         }}>
           ✦
         </footer>
       </article>
 
       <nav style={{
-        maxWidth: 760,
-        margin: "30px auto",
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 20,
+        background: noturno ? "#172119" : "#f4eedf",
+        borderTop: `1px solid ${dourado}`,
+        padding: "12px 16px",
         display: "flex",
         justifyContent: "space-between",
-        gap: 15,
-        color: verde,
-        fontSize: 14
+        alignItems: "center",
+        gap: 10
       }}>
         {anterior ? (
-          <Link href={`/livro/${anterior}`}>← Capítulo anterior</Link>
+          <Link href={`/livro/${anterior}`} style={linkRodape}>
+            ← Anterior
+          </Link>
         ) : <span />}
 
+        <Link href="/livro" style={linkRodape}>
+          ☷ Sumário
+        </Link>
+
         {proximo ? (
-          <Link href={`/livro/${proximo}`}>Próximo capítulo →</Link>
-        ) : (
-          <Link href="/livro">Voltar ao sumário</Link>
-        )}
+          <Link href={`/livro/${proximo}`} style={linkRodape}>
+            Próximo →
+          </Link>
+        ) : <span />}
       </nav>
+
+      <div style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 30,
+        background: noturno ? "#172119" : "#f4eedf",
+        padding: "7px 12px",
+        borderBottom: `1px solid ${dourado}`
+      }}>
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: 11,
+          color: verde,
+          marginBottom: 5
+        }}>
+          <span>Progresso da leitura</span>
+          <span>{progresso}%</span>
+        </div>
+
+        <div style={{
+          height: 4,
+          background: noturno ? "#455044" : "#d7c9a9",
+          borderRadius: 10,
+          overflow: "hidden"
+        }}>
+          <div style={{
+            width: `${progresso}%`,
+            height: "100%",
+            background: dourado,
+            transition: "width 0.2s"
+          }} />
+        </div>
+      </div>
     </main>
   );
 }
@@ -313,4 +316,11 @@ const botao = {
   marginRight: 7,
   fontSize: 14,
   cursor: "pointer"
+};
+
+const linkRodape = {
+  color: "#a18348",
+  textDecoration: "none",
+  fontSize: 13,
+  padding: "7px 4px"
 };
