@@ -1,3 +1,6 @@
+
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="min-h-screen">
@@ -53,16 +56,17 @@ export default function Home() {
           Por isso, florescem em metáforas.
         </p>
 
-        <button style={{
+        <Link href="/livro" style={{
           marginTop: "40px",
           padding: "16px 35px",
           background: "#173d2b",
           color: "#f4eedf",
           border: "1px solid #c5a15b",
-          fontSize: "16px"
+          fontSize: "16px",
+          display: "inline-block"
         }}>
           Entrar no jardim
-        </button>
+        </Link>
 
         <p style={{
           marginTop: "70px",
