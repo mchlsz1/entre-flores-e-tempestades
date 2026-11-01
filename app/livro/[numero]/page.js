@@ -124,8 +124,6 @@ export default function Capitulo() {
     document.addEventListener("visibilitychange", atualizarProgresso);
 
     return () => {
-      atualizarProgresso();
-
       window.removeEventListener("scroll", atualizarProgresso);
       window.removeEventListener("pagehide", atualizarProgresso);
       document.removeEventListener(
