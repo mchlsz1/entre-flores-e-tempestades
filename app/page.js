@@ -3,22 +3,34 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen">
-
+    <main>
       <header style={{
         background: "#102b20",
         color: "#f4eedf",
         padding: "25px 8%",
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "center"
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: "15px"
       }}>
         <h2>Entre Flores e Tempestades</h2>
-        <span style={{ color: "#c5a15b" }}>✦</span>
+
+        <nav style={{
+          display: "flex",
+          gap: "20px"
+        }}>
+          <Link href="/login">Entrar</Link>
+          <Link href="/cadastro" style={{
+            color: "#c5a15b"
+          }}>
+            Criar conta
+          </Link>
+        </nav>
       </header>
 
       <section style={{
-        minHeight: "80vh",
+        minHeight: "85vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
@@ -61,9 +73,7 @@ export default function Home() {
           padding: "16px 35px",
           background: "#173d2b",
           color: "#f4eedf",
-          border: "1px solid #c5a15b",
-          fontSize: "16px",
-          display: "inline-block"
+          border: "1px solid #c5a15b"
         }}>
           Entrar no jardim
         </Link>
@@ -78,7 +88,6 @@ export default function Home() {
         </p>
 
       </section>
-
     </main>
   );
 }
