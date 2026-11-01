@@ -32,15 +32,17 @@ export default function Capitulo() {
     setCarregado(true);
 
     if (posicaoSalva) {
-      const posicao = Number(posicaoSalva);
+  const posicao = Number(posicaoSalva);
 
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          window.scrollTo(0, posicao);
-        });
-      });
-    }
-  }, [codigo]);
+  window.history.scrollRestoration = "manual";
+
+  setTimeout(() => {
+    window.scrollTo({
+      top: posicao,
+      behavior: "instant"
+    });
+  }, 500);
+}
 
   useEffect(() => {
     if (!carregado) return;
