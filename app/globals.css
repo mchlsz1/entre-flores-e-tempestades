@@ -1,0 +1,29 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --verde: #173d2b;
+  --verde-escuro: #102b20;
+  --dourado: #c5a15b;
+  --marfim: #f4eedf;
+  --texto: #302d25;
+}
+
+body {
+  background: var(--marfim);
+  color: var(--texto);
+  font-family: Georgia, serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
