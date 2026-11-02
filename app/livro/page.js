@@ -124,8 +124,11 @@ export default function Livro() {
         </button>
       </div>
 
-      <header
-        style={{
+            </header>
+
+      <DesenhosDoJardim cor={cores.suave} />
+
+      <section style={{ maxWidth: "720px", margin: "0 auto" }}>
           textAlign: "center",
           maxWidth: "700px",
           margin: "75px auto 60px"
