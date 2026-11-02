@@ -137,11 +137,13 @@ export default function Home() {
         }
 
         .pequeno-titulo {
-          color: #e2c58a;
-          font-size: 11px;
-          letter-spacing: 4px;
-          margin-bottom: 25px;
-        }
+  color: #fff0c9;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  margin-bottom: 25px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}
 
         h1 {
           font-family: Georgia, serif;
