@@ -91,12 +91,12 @@ export default function Home() {
           position: absolute;
           inset: 0;
           background:
-            linear-gradient(
-              180deg,
-              rgba(5, 18, 12, 0.58),
-              rgba(5, 18, 12, 0.25) 42%,
-              rgba(5, 18, 12, 0.72)
-            );
+  linear-gradient(
+    180deg,
+    rgba(3, 12, 7, 0.78),
+    rgba(3, 12, 7, 0.58) 42%,
+    rgba(3, 12, 7, 0.88)
+  );
           z-index: -1;
         }
 
