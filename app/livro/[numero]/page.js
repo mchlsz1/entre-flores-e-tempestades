@@ -222,50 +222,7 @@ export default function Capitulo() {
         </Link>
       </header>
 
-      {/* Ajustes de leitura */}
-      <section style={{
-        maxWidth: 760,
-        margin: "0 auto 20px",
-        padding: 18,
-        background: papel,
-        border: `1px solid ${dourado}`,
-        display: "flex",
-        flexWrap: "wrap",
-        justifyContent: "space-between",
-        alignItems: "center",
-        gap: 15
-      }}>
-        <div>
-          <p style={{
-            color: verde,
-            fontSize: 13,
-            marginBottom: 8
-          }}>
-            AJUSTES DE LEITURA
-          </p>
-
-          <button
-            onClick={() => setFonte(v => Math.max(16, v - 2))}
-            style={botao}
-          >
-            A−
-          </button>
-
-          <button
-            onClick={() => setFonte(v => Math.min(30, v + 2))}
-            style={botao}
-          >
-            A+
-          </button>
-        </div>
-
-        <button
-          onClick={() => setNoturno(v => !v)}
-          style={botao}
-        >
-          {noturno ? "☀ Modo claro" : "☾ Modo noturno"}
-        </button>
-      </section>
+  
 
       {/* Página do livro */}
       <article style={{
@@ -374,7 +331,8 @@ export default function Capitulo() {
         </footer>
       </article>
 
-      {/* Navegação fixa inferior */}
+   
+      {/* Barra inferior: leitura e navegação */}
       <nav style={{
         position: "fixed",
         bottom: 0,
@@ -383,40 +341,90 @@ export default function Capitulo() {
         zIndex: 20,
         background: noturno ? "#172119" : "#f4eedf",
         borderTop: `1px solid ${dourado}`,
-        padding: "12px 16px",
+        padding: "9px 12px",
         display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        gap: 10
+        flexDirection: "column",
+        gap: 8
       }}>
-        {anterior ? (
+
+        {/* Controles de leitura */}
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 18
+        }}>
+          <button
+            onClick={() => setFonte(v => Math.max(16, v - 2))}
+            style={linkRodape}
+          >
+            A−
+          </button>
+
+          <span style={{
+            color: verde,
+            fontSize: 11
+          }}>
+            Tamanho da letra
+          </span>
+
+          <button
+            onClick={() => setFonte(v => Math.min(30, v + 2))}
+            style={linkRodape}
+          >
+            A+
+          </button>
+
+          <button
+            onClick={() => setNoturno(v => !v)}
+            style={{
+              ...linkRodape,
+              border: `1px solid ${dourado}`,
+              borderRadius: 4,
+              background: "transparent"
+            }}
+          >
+            {noturno ? "☀ Claro" : "☾ Escuro"}
+          </button>
+        </div>
+
+        {/* Navegação entre capítulos */}
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 8
+        }}>
+          {anterior ? (
+            <Link
+              href={`/livro/${anterior}`}
+              onClick={salvarAntesDeSair}
+              style={linkRodape}
+            >
+              ← Anterior
+            </Link>
+          ) : <span />}
+
           <Link
-            href={`/livro/${anterior}`}
+            href="/livro"
             onClick={salvarAntesDeSair}
             style={linkRodape}
           >
-            ← Anterior
+            ☷ Sumário
           </Link>
-        ) : <span />}
 
-        <Link
-          href="/livro"
-          onClick={salvarAntesDeSair}
-          style={linkRodape}
-        >
-          ☷ Sumário
-        </Link>
-
-        {proximo ? (
-          <Link
-            href={`/livro/${proximo}`}
-            onClick={salvarAntesDeSair}
-            style={linkRodape}
-          >
-            Próximo →
-          </Link>
-        ) : <span />}
+          {proximo ? (
+            <Link
+              href={`/livro/${proximo}`}
+              onClick={salvarAntesDeSair}
+              style={linkRodape}
+            >
+              Próximo →
+            </Link>
+          ) : <span />}
+        </div>
       </nav>
+
 
       {/* Barra fixa de progresso */}
       <div style={{
